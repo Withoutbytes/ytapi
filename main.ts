@@ -70,11 +70,11 @@ app.get("/music/url", async (req, res) => {
     try {
         const info = await ytdl.getBasicInfo(videoId);
 
-        const video = (info.player_response.streamingData.formats as IFormat[])
-            .find(f => f.mimeType.includes("video/mp4; "));
-        if (!video) return res.status(404).send("Video not found");
+        const videos = (info.player_response.streamingData.formats as IFormat[])
+            .filter(f => f.mimeType.includes("video/mp4; "));
+        if (!videos) return res.status(404).send("Video not found");
 
-        res.send({ videoUrl: video.url });
+        res.send({ videoUrl: videos[0].url, videos });
 
     } catch (e) {
         const error = e as Error;
