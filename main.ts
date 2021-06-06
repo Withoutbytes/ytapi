@@ -74,7 +74,7 @@ app.get("/music/url", async (req, res) => {
             .filter(f => f.mimeType.includes("video/mp4; "));
         if (!videos) return res.status(404).send("Video not found");
 
-        res.send({ videoUrl: videos[0].url, videos });
+        res.send({ videoUrl: videos[0].url, videos: videos.map(v => v.url) });
 
     } catch (e) {
         const error = e as Error;
