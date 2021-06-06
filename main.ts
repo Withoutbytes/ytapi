@@ -3,7 +3,27 @@ import yts from "yt-search";
 import express from "express";
 const app = express();
 
-app.use(express.query({}))
+app.use(express.query({}));
+
+interface IFormat {
+    itag: number;
+    url: string;
+    mimeType: string;
+    bitrate: number;
+    width: number;
+    height: number;
+    lastModified: string;
+    contentLength: string;
+    quality: string;
+    fps: number;
+    qualityLabel: string;
+    projectionType: string;
+    averageBitrate: number;
+    audioQuality: string;
+    approxDurationMs: string;
+    audioSampleRate: string;
+    audioChannels: number;
+}
 
 app.get("/music", async (req, res) => {
     const { query } = req.query;
@@ -28,16 +48,34 @@ app.get("/music", async (req, res) => {
     }
 });
 
-app.get("/music/play", async (req, res) => {
+// app.get("/music/play", async (req, res) => {
+//     const { videoId } = req.query;
+//     if (typeof videoId != "string") return res.status(400).send("Missing video query param");
+//     try {
+//         const info = await ytdl.getBasicInfo(videoId);
+
+//         ytdl(videoId, {
+//             filter: format => format.container === 'mp4',
+//             // quality: "140",
+//         }).pipe(res);
+//     } catch (e) {
+//         const error = e as Error;
+//         res.status(500).send(error?.message);
+//     }
+// });
+
+app.get("/music/url", async (req, res) => {
     const { videoId } = req.query;
     if (typeof videoId != "string") return res.status(400).send("Missing video query param");
     try {
         const info = await ytdl.getBasicInfo(videoId);
 
-        ytdl(videoId, {
-            filter: format => format.container === 'mp4',
-            // quality: "140",
-        }).pipe(res);
+        const video = (info.player_response.streamingData.formats as IFormat[])
+            .find(f => f.mimeType.includes("video/mp4; "));
+        if (!video) return res.status(404).send("Video not found");
+
+        res.send({ videoUrl: video.url });
+
     } catch (e) {
         const error = e as Error;
         res.status(500).send(error?.message);
