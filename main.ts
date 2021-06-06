@@ -57,6 +57,6 @@ app.get("/music/search", async (req, res) => {
         res.status(500).send(error?.message);
     }
 })
-
-app.listen(8083, () => console.log("Server at http://localhost:8083"));
+const port = process.env.PORT || 8083;
+app.listen(port, () => console.log(`Server at http://localhost:${port}`));
 
